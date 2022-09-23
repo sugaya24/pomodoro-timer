@@ -1,0 +1,28 @@
+import React, { ReactNode } from "react";
+
+type ModalProps = {
+  id: string;
+  btnText: ReactNode;
+  content: ReactNode;
+};
+const Modal = ({ id, btnText, content }: ModalProps) => {
+  return (
+    <div className="flex w-full justify-center">
+      <label
+        htmlFor={id}
+        className="modal-button btn btn-ghost h-full hover:bg-transparent"
+      >
+        {btnText}
+      </label>
+
+      <input type="checkbox" id={id} className="modal-toggle" />
+      <label htmlFor={id} className="modal cursor-pointer">
+        <label className="modal-box relative" htmlFor="">
+          {content}
+        </label>
+      </label>
+    </div>
+  );
+};
+
+export default Modal;

@@ -1,11 +1,25 @@
+import classNames from "classnames";
 import React from "react";
 
-function Button({ text }: { text: string }) {
+function Button({
+  text,
+  borderColor,
+  textColor,
+}: {
+  text: string;
+  borderColor: string;
+  textColor: string;
+}) {
+  const btnClass = classNames(
+    "inline-block rounded-lg border bg-transparent px-6 py-2 font-bold transition duration-150 ease-in-out hover:border-transparent hover:text-white",
+    `border-${borderColor}`,
+    `text-${textColor}`,
+    `hover:bg-${borderColor}`,
+  );
+  console.log(btnClass);
+
   return (
-    <button
-      type="button"
-      className="mx-auto my-4 inline-block rounded-lg border border-cyan-600 bg-transparent px-6 py-2 font-bold text-cyan-600 transition duration-150 ease-in-out hover:border-transparent hover:bg-cyan-600 hover:text-white"
-    >
+    <button type="button" className={btnClass}>
       {text}
     </button>
   );

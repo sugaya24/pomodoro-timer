@@ -1,33 +1,58 @@
 import type { NextPage } from "next";
 import React from "react";
 
-import Button from "../components/ui/Button";
+import Modal from "../components/Modal";
+import { AddIcon, ListIcon } from "../components/icons";
+import { Header } from "../features/header/components";
+import { MainTaskTitle } from "../features/main-task-title/components";
+import { Timer } from "../features/timer/components";
+
+const btnText = (
+  <div className="flex items-center gap-2">
+    <AddIcon />
+    <span className="font-bold">Add Task</span>
+  </div>
+);
+
+const modalContent = () => {
+  return (
+    <>
+      <h3 className="mb-2 text-lg font-bold text-base-light-gray">New Task</h3>
+      <div className="form-control">
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder="Math assignment"
+            className="input input-bordered w-full"
+          />
+          <button className="btn btn-square">
+            <AddIcon />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
 
 const Home: NextPage = () => {
   return (
-    <div className="mx-auto flex h-screen max-w-4xl flex-col text-center">
-      <div className="flex flex-grow flex-col items-center">
-        <div className="flex h-full items-center">
-          <div className="flex flex-col gap-4">
-            <h1 className="w-full text-3xl font-bold">Next.js Starter</h1>
-            <ul>
-              <li>🔥 TypeScript</li>
-              <li>💎 tailwindcss</li>
-              <li>📏 ESLint</li>
-              <li>💖 Prettier</li>
-              <li>🐶 Husky</li>
-              <li>🚫 Lint-staged</li>
-              <li>🚓 commitlint</li>
-              <li>📚 Storybook</li>
-              <li>🃏 Jest</li>
-              <li>🤖 Cypress</li>
-            </ul>
+    <div className="mx-auto h-screen bg-base-white">
+      <div className="mx-auto mb-8 h-full max-w-xl p-8">
+        <Header />
+        <MainTaskTitle />
+        <div className="my-16">
+          <Timer />
+        </div>
+        <div className="flex w-full flex-col justify-center gap-4">
+          <Modal id="add-task" btnText={btnText} content={modalContent()} />
+          <div className="flex items-center justify-center">
+            <button className="btn btn-ghost gap-2 hover:bg-transparent">
+              <ListIcon />
+              <span className="font-bold">Task List</span>
+            </button>
           </div>
         </div>
       </div>
-      <a href="https://github.com/sugaya24/next-ts-tailwind-starter">
-        <Button text="GitHub" />
-      </a>
     </div>
   );
 };
