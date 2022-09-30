@@ -3,6 +3,7 @@ import React from "react";
 
 import Modal from "../components/Modal";
 import { AddIcon, ListIcon } from "../components/icons";
+import { AddTaskModal } from "../features/add-task-modal/components";
 import { Header } from "../features/header/components";
 import { MainTaskTitle } from "../features/main-task-title/components";
 import { Timer } from "../features/timer/components";
@@ -14,26 +15,6 @@ const btnText = (
   </div>
 );
 
-const modalContent = () => {
-  return (
-    <>
-      <h3 className="mb-2 text-lg font-bold text-base-light-gray">New Task</h3>
-      <div className="form-control">
-        <div className="input-group">
-          <input
-            type="text"
-            placeholder="Math assignment"
-            className="input input-bordered w-full"
-          />
-          <button className="btn btn-square">
-            <AddIcon />
-          </button>
-        </div>
-      </div>
-    </>
-  );
-};
-
 const Home: NextPage = () => {
   return (
     <div className="mx-auto h-screen bg-base-white">
@@ -44,7 +25,7 @@ const Home: NextPage = () => {
           <Timer />
         </div>
         <div className="flex w-full flex-col justify-center gap-4">
-          <Modal id="add-task" btnText={btnText} content={modalContent()} />
+          <Modal id="add-task" btnText={btnText} content={AddTaskModal()} />
           <div className="flex items-center justify-center">
             <button className="btn btn-ghost gap-2 hover:bg-transparent">
               <ListIcon />
