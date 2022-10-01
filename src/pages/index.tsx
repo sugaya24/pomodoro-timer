@@ -17,8 +17,8 @@ const btnText = (
 
 const Home: NextPage = () => {
   return (
-    <div className="mx-auto h-screen bg-base-white">
-      <div className="mx-auto mb-8 h-full max-w-xl p-8">
+    <div className="mx-auto min-h-screen bg-base-white">
+      <div className="mx-auto h-full max-w-xl p-8">
         <Header />
         <MainTaskTitle />
         <div className="my-16">

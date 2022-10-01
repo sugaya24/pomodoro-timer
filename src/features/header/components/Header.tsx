@@ -1,16 +1,34 @@
 import React from "react";
 
+import { useAuth } from "../../../contexts";
+
 const Header = () => {
+  const { user, logout } = useAuth();
+
   return (
     <div className="flex justify-between p-2">
       <div className="dummy"></div>
-      <a href="#" className="block shrink-0">
-        <img
-          alt="Man"
-          src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-          className="h-10 w-10 rounded-full object-cover"
-        />
-      </a>
+      {user ? (
+        <div className="avatar dropdown dropdown-end">
+          <div tabIndex={0} className="mask mask-squircle w-10 cursor-pointer">
+            <img src={user.photoURL || ""} alt="avatar" />
+          </div>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
+          >
+            <li>
+              <label htmlFor="logout" onClick={() => logout()}>
+                Logout
+              </label>
+            </li>
+          </ul>
+        </div>
+      ) : (
+        <a href="/login">
+          <label className="btn btn-outline border-2">Login</label>
+        </a>
+      )}
     </div>
   );
 };
