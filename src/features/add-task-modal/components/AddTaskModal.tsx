@@ -2,11 +2,44 @@ import React, { useState } from "react";
 
 import { TaskItem } from ".";
 import { AddIcon } from "../../../components/icons";
-import { useTasksContext } from "../../../contexts";
+import { useAuth, useTasksContext } from "../../../contexts";
 
 const AddTaskModal = () => {
+  const { user } = useAuth();
   const { tasks, setTasks } = useTasksContext();
   const [input, setInput] = useState("");
+
+  const addTaskHandle = async () => {
+    if (!user) {
+      if (input.length < 1) {
+        return;
+      }
+      setTasks([
+        ...tasks,
+        {
+          id: input,
+          title: input,
+          active: false,
+          count: 0,
+        },
+      ]);
+      setInput("");
+    } else {
+      await fetch(`/api/tasks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: input,
+          active: false,
+          count: 0,
+          uid: user.uid,
+        }),
+      });
+      setInput("");
+    }
+  };
 
   return (
     <>
@@ -20,24 +53,7 @@ const AddTaskModal = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
-          <button
-            className="btn btn-square"
-            onClick={() => {
-              if (input.length < 1) {
-                return;
-              }
-              setTasks([
-                ...tasks,
-                {
-                  id: input,
-                  title: input,
-                  active: false,
-                  count: 0,
-                },
-              ]);
-              setInput("");
-            }}
-          >
+          <button className="btn btn-square" onClick={addTaskHandle}>
             <AddIcon />
           </button>
         </div>
