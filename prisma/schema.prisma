@@ -17,13 +17,15 @@ model Task {
   count  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  // author User    @relation(fields: [authorId], references: [id])
-  // authorId String  @db.ObjectId
+  author User?    @relation(fields: [authorId], references: [id])
+  authorId String  @db.ObjectId
 }
 
-// model User {
-//   id    String @id @default(auto()) @map("_id") @db.ObjectId
-//   name  String
-//   email String @unique
-//   tasks Task[]
-// }
+model User {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  uid String  @unique
+  displayName  String
+  email String
+  photoURL String
+  tasks Task[]
+}

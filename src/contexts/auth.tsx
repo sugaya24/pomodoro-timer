@@ -37,14 +37,46 @@ export const AuthProvider: React.FC<{ children?: ReactNode }> = ({
   };
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (fbUser) => {
-      if (fbUser) {
-        setUser({
+    const userFetch = async (fbUser: FirebaseUser) => {
+      const res = await fetch(`/api/users/${fbUser.uid}`);
+      const data = await res.json();
+      return data;
+    };
+    const registerUser = async (fbUser: FirebaseUser) => {
+      const res = await fetch(`/api/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           uid: fbUser.uid,
           displayName: fbUser.displayName,
           email: fbUser.email,
           photoURL: fbUser.photoURL,
-        });
+        }),
+      });
+      return await res.json();
+    };
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        const data = await userFetch(fbUser);
+        if (data.user) {
+          setUser({
+            uid: data.user.uid,
+            displayName: data.user.displayName,
+            email: data.user.email,
+            photoURL: data.user.photoURL,
+          });
+        } else {
+          const data = await registerUser(fbUser);
+          setUser({
+            uid: data.newUser.uid,
+            displayName: data.newUser.displayName,
+            email: data.newUser.email,
+            photoURL: data.newUser.photoURL,
+          });
+        }
       } else {
         setUser(null);
       }
