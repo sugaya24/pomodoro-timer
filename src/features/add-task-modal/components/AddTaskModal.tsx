@@ -6,23 +6,13 @@ import { useAuth, useTasksContext } from "../../../contexts";
 
 const AddTaskModal = () => {
   const { user } = useAuth();
-  const { tasks, setTasks } = useTasksContext();
+  const {
+    state: { tasks },
+  } = useTasksContext();
   const [input, setInput] = useState("");
 
   const addTaskHandle = async () => {
     if (!user) {
-      if (input.length < 1) {
-        return;
-      }
-      setTasks([
-        ...tasks,
-        {
-          id: input,
-          title: input,
-          active: false,
-          count: 0,
-        },
-      ]);
       setInput("");
     } else {
       await fetch(`/api/tasks`, {

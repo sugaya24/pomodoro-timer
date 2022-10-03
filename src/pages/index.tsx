@@ -1,8 +1,9 @@
 import type { NextPage } from "next";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 
 import Modal from "../components/Modal";
 import { AddIcon, ListIcon } from "../components/icons";
+import { useAuth, useTasksContext } from "../contexts";
 import { AddTaskModal } from "../features/add-task-modal/components";
 import { Header } from "../features/header/components";
 import { MainTaskTitle } from "../features/main-task-title/components";
@@ -16,6 +17,18 @@ const btnText = (
 );
 
 const Home: NextPage = () => {
+  const { user } = useAuth();
+  const { getAll } = useTasksContext();
+  const stableGetAll = useCallback(getAll, [user]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      // TODO: make tasks empty
+    } else {
+      stableGetAll(user?.uid);
+    }
+  }, [user]);
+
   return (
     <div className="mx-auto min-h-screen bg-base-white">
       <div className="mx-auto h-full max-w-xl p-8">

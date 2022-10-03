@@ -3,7 +3,9 @@ import React from "react";
 import { useTasksContext } from "../../../contexts";
 
 const MainTaskTitle = () => {
-  const { tasks } = useTasksContext();
+  const {
+    state: { tasks },
+  } = useTasksContext();
   const activeTask = tasks.find((task) => task.active);
 
   return (

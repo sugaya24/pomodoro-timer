@@ -2,12 +2,10 @@ import React, {
   ReactNode,
   createContext,
   useContext,
-  useEffect,
   useMemo,
-  useState,
+  useReducer,
 } from "react";
 
-import getUserTasks from "../lib/getUserTasks";
 import { useAuth } from "./auth";
 
 export type TTask = {
@@ -17,9 +15,48 @@ export type TTask = {
   count: 0;
 };
 type TTasksContext = {
-  tasks: TTask[];
-  setTasks: React.Dispatch<React.SetStateAction<TTask[]>>;
+  state: TTaskState;
+  getAll: (uid: string) => Promise<any>;
   children?: ReactNode;
+};
+
+enum TaskActionKind {
+  GET_ALL = "GET_ALL",
+  ADD_TASK = "ADD_TASK",
+}
+enum TaskActionKindError {
+  GET_ALL_ERR = "GET_ALL_ERR",
+}
+
+type TTaskState = {
+  tasks: TTask[];
+  error?: Error | null | undefined;
+};
+
+type TaskAction =
+  | {
+      type: TaskActionKind;
+      payload: TTaskState;
+    }
+  | {
+      type: TaskActionKindError;
+      payload?: any;
+    };
+
+const taskReducer = (state: TTaskState, action: TaskAction): TTaskState => {
+  switch (action.type) {
+    case TaskActionKind.GET_ALL:
+      return { ...state, tasks: action.payload.tasks };
+    case TaskActionKindError.GET_ALL_ERR:
+      return { ...state, error: action.payload };
+    default:
+      throw new Error();
+  }
+};
+
+const initialState: TTaskState = {
+  tasks: [],
+  error: null,
 };
 
 const TasksContext = createContext<TTasksContext>({} as TTasksContext);
@@ -27,27 +64,29 @@ const TasksContext = createContext<TTasksContext>({} as TTasksContext);
 export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   // get task data from db if the user already logged in
-  const [tasks, setTasks] = useState<TTask[]>([]);
+  const [state, dispatch] = useReducer(taskReducer, initialState);
 
-  useEffect(() => {
-    const fetcher = async (uid: string) => {
-      const tasks = await getUserTasks(uid);
-      setTasks(tasks);
-    };
-    if (!user) {
-      setTasks([]);
-    } else {
-      if (!user.uid) {
-        return;
+  async function getAll(uid: string) {
+    try {
+      const res = await fetch(`/api/users/${uid}/tasks`);
+      const data: TaskAction["payload"] = await res.json();
+      if (res.ok) {
+        dispatch({
+          type: TaskActionKind.GET_ALL,
+          payload: { tasks: data.tasks },
+        });
       }
-      fetcher(user.uid);
+    } catch (err) {
+      dispatch({ type: TaskActionKindError.GET_ALL_ERR, payload: err });
     }
-    return () => {
-      fetcher;
-    };
-  }, [user]);
+  }
 
-  const values = useMemo(() => ({ tasks, setTasks }), [tasks, setTasks]);
+  const values = useMemo(() => {
+    return {
+      state,
+      getAll,
+    };
+  }, [state]);
 
   return (
     <TasksContext.Provider value={values}>{children}</TasksContext.Provider>
