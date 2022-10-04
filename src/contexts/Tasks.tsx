@@ -6,10 +6,8 @@ import React, {
   useReducer,
 } from "react";
 
-import { useAuth } from "./auth";
-
 export type TTask = {
-  id: string;
+  uid: string;
   title: string;
   active: boolean;
   count: 0;
@@ -17,15 +15,17 @@ export type TTask = {
 type TTasksContext = {
   state: TTaskState;
   getAll: (uid: string) => Promise<any>;
+  createTask: (body: TTask) => Promise<void>;
   children?: ReactNode;
 };
 
 enum TaskActionKind {
   GET_ALL = "GET_ALL",
-  ADD_TASK = "ADD_TASK",
+  CREATE_TASK = "CREATE_TASK",
 }
 enum TaskActionKindError {
   GET_ALL_ERR = "GET_ALL_ERR",
+  CREATE_TASK_ERR = "CREATE_TASK_ERR",
 }
 
 type TTaskState = {
@@ -36,7 +36,7 @@ type TTaskState = {
 type TaskAction =
   | {
       type: TaskActionKind;
-      payload: TTaskState;
+      payload?: TTaskState;
     }
   | {
       type: TaskActionKindError;
@@ -46,8 +46,12 @@ type TaskAction =
 const taskReducer = (state: TTaskState, action: TaskAction): TTaskState => {
   switch (action.type) {
     case TaskActionKind.GET_ALL:
-      return { ...state, tasks: action.payload.tasks };
+      return { ...state, tasks: action.payload?.tasks || [] };
     case TaskActionKindError.GET_ALL_ERR:
+      return { ...state, error: action.payload };
+    case TaskActionKind.CREATE_TASK:
+      return { ...state };
+    case TaskActionKindError.CREATE_TASK_ERR:
       return { ...state, error: action.payload };
     default:
       throw new Error();
@@ -62,7 +66,6 @@ const initialState: TTaskState = {
 const TasksContext = createContext<TTasksContext>({} as TTasksContext);
 
 export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
   // get task data from db if the user already logged in
   const [state, dispatch] = useReducer(taskReducer, initialState);
 
@@ -81,10 +84,26 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  async function createTask(body: TTask) {
+    try {
+      dispatch({ type: TaskActionKind.CREATE_TASK });
+      await fetch(`/api/tasks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+    } catch (err) {
+      dispatch({ type: TaskActionKindError.CREATE_TASK_ERR, payload: err });
+    }
+  }
+
   const values = useMemo(() => {
     return {
       state,
       getAll,
+      createTask,
     };
   }, [state]);
 
