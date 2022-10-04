@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-import { TaskItem } from ".";
-import { AddIcon } from "../../../components/icons";
+import { TaskInput, TaskList } from ".";
 import { useAuth, useTasksContext } from "../../../contexts";
 
 const AddTaskModal = () => {
@@ -35,24 +34,9 @@ const AddTaskModal = () => {
     <>
       <h3 className="mb-2 text-lg font-bold text-base-light-gray">New Task</h3>
       <div className="form-control">
-        <div className="input-group">
-          <input
-            type="text"
-            placeholder="Math assignment"
-            className="input input-bordered w-full"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <button className="btn btn-square" onClick={addTaskHandle}>
-            <AddIcon />
-          </button>
-        </div>
+        <TaskInput addTaskHandle={addTaskHandle} />
       </div>
-      <div className="mt-4">
-        {tasks.map((task) => (
-          <TaskItem key={task.id} task={task} />
-        ))}
-      </div>
+      <TaskList tasks={tasks} />
     </>
   );
 };

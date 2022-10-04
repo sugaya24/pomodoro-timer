@@ -4,7 +4,6 @@ import React, { useCallback, useEffect } from "react";
 import Modal from "../components/Modal";
 import { AddIcon, ListIcon } from "../components/icons";
 import { useAuth, useTasksContext } from "../contexts";
-import { AddTaskModal } from "../features/add-task-modal/components";
 import { Header } from "../features/header/components";
 import { MainTaskTitle } from "../features/main-task-title/components";
 import { Timer } from "../features/timer/components";
@@ -38,7 +37,7 @@ const Home: NextPage = () => {
           <Timer />
         </div>
         <div className="flex w-full flex-col justify-center gap-4">
-          <Modal id="add-task" btnText={btnText} content={AddTaskModal()} />
+          <Modal id="add-task" btnText={btnText} />
           <div className="flex items-center justify-center">
             <button className="btn btn-ghost gap-2 hover:bg-transparent">
               <ListIcon />

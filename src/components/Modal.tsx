@@ -1,11 +1,12 @@
 import React, { ReactNode } from "react";
 
+import { AddTaskModal } from "../features/add-task-modal/components";
+
 type ModalProps = {
   id: string;
   btnText: ReactNode;
-  content: ReactNode;
 };
-const Modal = ({ id, btnText, content }: ModalProps) => {
+const Modal = ({ id, btnText }: ModalProps) => {
   return (
     <div className="flex w-full justify-center">
       <label
@@ -18,7 +19,7 @@ const Modal = ({ id, btnText, content }: ModalProps) => {
       <input type="checkbox" id={id} className="modal-toggle" />
       <label htmlFor={id} className="modal cursor-pointer">
         <label className="modal-box relative" htmlFor="">
-          {content}
+          <AddTaskModal />
         </label>
       </label>
     </div>
