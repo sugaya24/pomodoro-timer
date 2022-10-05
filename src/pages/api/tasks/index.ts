@@ -11,7 +11,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       res.status(400).json({});
     }
   } else if (req.method === "POST") {
-    const { title, uid } = req.body;
+    const { title, id } = req.body;
     const newTask = await prisma.task.create({
       data: {
         title: title,
@@ -19,12 +19,12 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         active: false,
         author: {
           connect: {
-            uid: uid,
+            uid: id,
           },
         },
       },
     });
-    res.status(201).json({ newTask });
+    res.status(201).json(newTask);
   } else {
     res.status(400).json({});
   }

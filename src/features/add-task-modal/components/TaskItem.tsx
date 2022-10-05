@@ -7,7 +7,7 @@ type TaskItemProps = {
 };
 
 const TaskItem = ({ task }: TaskItemProps) => {
-  const { tasks, setTasks } = useTasksContext();
+  const { setFocusedTaskId } = useTasksContext();
   const [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -42,15 +42,8 @@ const TaskItem = ({ task }: TaskItemProps) => {
               htmlFor="focus"
               className="btn btn-outline btn-error"
               onClick={() => {
-                const updatedTasks = tasks.map((t) => {
-                  if (task.id === t.id) {
-                    t.active = true;
-                  } else {
-                    t.active = false;
-                  }
-                  return t;
-                });
-                setTasks(updatedTasks);
+                setFocusedTaskId(task.id);
+                localStorage.setItem("focusedTaskId", task.id);
               }}
             >
               🍅

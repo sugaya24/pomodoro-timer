@@ -2,12 +2,14 @@ import React, {
   ReactNode,
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useReducer,
+  useState,
 } from "react";
 
 export type TTask = {
-  uid: string;
+  id: string;
   title: string;
   active: boolean;
   count: 0;
@@ -16,12 +18,20 @@ type TTasksContext = {
   state: TTaskState;
   getAll: (uid: string) => Promise<any>;
   createTask: (body: TTask) => Promise<void>;
+  focusedTaskId: string | null | undefined;
+  setFocusedTaskId: React.Dispatch<
+    React.SetStateAction<string | null | undefined>
+  >;
+  addTask: (body: TTask) => Promise<void>;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   children?: ReactNode;
 };
 
 enum TaskActionKind {
   GET_ALL = "GET_ALL",
   CREATE_TASK = "CREATE_TASK",
+  ADD_TASK = "ADD_TASK",
 }
 enum TaskActionKindError {
   GET_ALL_ERR = "GET_ALL_ERR",
@@ -30,13 +40,14 @@ enum TaskActionKindError {
 
 type TTaskState = {
   tasks: TTask[];
-  error?: Error | null | undefined;
+  focusedTaskId?: string | null;
+  error?: Error | null;
 };
 
 type TaskAction =
   | {
       type: TaskActionKind;
-      payload?: TTaskState;
+      payload?: any;
     }
   | {
       type: TaskActionKindError;
@@ -53,6 +64,8 @@ const taskReducer = (state: TTaskState, action: TaskAction): TTaskState => {
       return { ...state };
     case TaskActionKindError.CREATE_TASK_ERR:
       return { ...state, error: action.payload };
+    case TaskActionKind.ADD_TASK:
+      return { ...state, tasks: [action.payload, ...state.tasks] };
     default:
       throw new Error();
   }
@@ -60,6 +73,7 @@ const taskReducer = (state: TTaskState, action: TaskAction): TTaskState => {
 
 const initialState: TTaskState = {
   tasks: [],
+  focusedTaskId: null,
   error: null,
 };
 
@@ -68,6 +82,14 @@ const TasksContext = createContext<TTasksContext>({} as TTasksContext);
 export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
   // get task data from db if the user already logged in
   const [state, dispatch] = useReducer(taskReducer, initialState);
+  const [focusedTaskId, setFocusedTaskId] = useState<string | null>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== undefined) {
+      setFocusedTaskId(localStorage.getItem("focusedTaskId"));
+    }
+  }, []);
 
   async function getAll(uid: string) {
     try {
@@ -99,13 +121,25 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  async function addTask(body: TTask) {
+    dispatch({
+      type: TaskActionKind.ADD_TASK,
+      payload: body,
+    });
+  }
+
   const values = useMemo(() => {
     return {
       state,
       getAll,
       createTask,
+      focusedTaskId,
+      setFocusedTaskId,
+      addTask,
+      isLoading,
+      setIsLoading,
     };
-  }, [state]);
+  }, [state, focusedTaskId, isLoading]);
 
   return (
     <TasksContext.Provider value={values}>{children}</TasksContext.Provider>

@@ -1,12 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { useTasksContext } from "../../../contexts";
+import { TTask, useTasksContext } from "../../../contexts";
 
 const MainTaskTitle = () => {
   const {
     state: { tasks },
+    focusedTaskId,
   } = useTasksContext();
-  const activeTask = tasks.find((task) => task.active);
+  const [activeTask, setActiveTask] = useState<TTask>();
+
+  useEffect(() => {
+    const newActiveTask = tasks.find((task) => task.id === focusedTaskId);
+    setActiveTask(newActiveTask);
+  }, [focusedTaskId, tasks]);
 
   return (
     <div className="p-2">

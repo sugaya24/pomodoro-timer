@@ -1,4 +1,5 @@
 import React from "react";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 import { TaskInput, TaskList } from ".";
 import { useTasksContext } from "../../../contexts";
@@ -6,8 +7,8 @@ import { useTasksContext } from "../../../contexts";
 const AddTaskModal = () => {
   const {
     state: { tasks },
+    isLoading,
   } = useTasksContext();
-  // const [input, setInput] = useState("");
 
   return (
     <>
@@ -15,6 +16,11 @@ const AddTaskModal = () => {
       <div className="form-control">
         <TaskInput />
       </div>
+      {isLoading && (
+        <div className="mt-4 flex justify-center">
+          <AiOutlineLoading3Quarters className="animate-spin" />
+        </div>
+      )}
       <TaskList tasks={tasks} />
     </>
   );

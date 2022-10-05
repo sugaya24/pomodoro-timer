@@ -11,6 +11,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           uid: id,
         },
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
     res.status(200).json({ tasks });
   } else {
