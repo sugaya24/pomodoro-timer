@@ -25,6 +25,8 @@ type TTasksContext = {
   addTask: (body: TTask) => Promise<void>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  updateTask: (id: string, task: TTask) => Promise<void>;
+  updateTaskWithoutAuth: (id: string, task: TTask) => Promise<void>;
   children?: ReactNode;
 };
 
@@ -32,6 +34,8 @@ enum TaskActionKind {
   GET_ALL = "GET_ALL",
   CREATE_TASK = "CREATE_TASK",
   ADD_TASK = "ADD_TASK",
+  UPDATE_TASK = "UPDATE_TASK",
+  UPDATE_TASK_WITHOUT_AUTH = "UPDATE_TASK_WITHOUT_AUTH",
 }
 enum TaskActionKindError {
   GET_ALL_ERR = "GET_ALL_ERR",
@@ -66,6 +70,10 @@ const taskReducer = (state: TTaskState, action: TaskAction): TTaskState => {
       return { ...state, error: action.payload };
     case TaskActionKind.ADD_TASK:
       return { ...state, tasks: [action.payload, ...state.tasks] };
+    case TaskActionKind.UPDATE_TASK:
+      return { ...state };
+    case TaskActionKind.UPDATE_TASK_WITHOUT_AUTH:
+      return { ...state };
     default:
       throw new Error();
   }
@@ -128,6 +136,36 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
     });
   }
 
+  async function updateTask(id: string, task: TTask) {
+    try {
+      dispatch({
+        type: TaskActionKind.UPDATE_TASK,
+      });
+      await fetch(`/api/tasks/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: id, task: task }),
+      });
+    } catch (err) {
+      // TODO: error
+    }
+  }
+
+  async function updateTaskWithoutAuth(id: string, task: TTask) {
+    const updatedTasks = state.tasks.map((t) => {
+      if (t.id === id) {
+        t.title = task.title;
+      }
+      return t;
+    });
+    dispatch({
+      type: TaskActionKind.UPDATE_TASK_WITHOUT_AUTH,
+      payload: updatedTasks,
+    });
+  }
+
   const values = useMemo(() => {
     return {
       state,
@@ -136,6 +174,8 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
       focusedTaskId,
       setFocusedTaskId,
       addTask,
+      updateTask,
+      updateTaskWithoutAuth,
       isLoading,
       setIsLoading,
     };

@@ -1,43 +1,49 @@
 import React, { useState } from "react";
 
-import { TTask, useTasksContext } from "../../../contexts";
+import { TTask, useAuth, useTasksContext } from "../../../contexts";
 
 type TaskItemProps = {
   task: TTask;
 };
 
 const TaskItem = ({ task }: TaskItemProps) => {
-  const { setFocusedTaskId } = useTasksContext();
-  const [isEditing, setIsEditing] = useState(false);
+  const { user } = useAuth();
+  const {
+    setFocusedTaskId,
+    focusedTaskId,
+    updateTask,
+    updateTaskWithoutAuth,
+    getAll,
+  } = useTasksContext();
+  const [isEditingInput, setIsEditingInput] = useState(false);
+  const [input, setInput] = useState(task.title);
 
   return (
     <div
       key={task.id}
       className="mb-2 w-full rounded-lg bg-base-light-gray p-4 text-white"
     >
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2">
-          {task.active && <div>🍅</div>}
-          <span className="">{task.title}</span>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex w-full gap-2">
+          {isEditingInput ? (
+            <>
+              <input
+                className="input w-full text-base-gray"
+                autoFocus
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
+            </>
+          ) : (
+            <>
+              {task.id === focusedTaskId && <div>🍅</div>}
+              <span className="">{task.title}</span>
+            </>
+          )}
         </div>
-        <div className="">
-          <label
-            className="btn btn-ghost btn-sm"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            ▼
-          </label>
-        </div>
-      </div>
-      {isEditing && (
-        <div className="">
-          <div className="flex flex-col">
-            <span>id: {task.id}</span>
-            <span>title: {task.title}</span>
-            <span>focus: {task.active.toString()}</span>
-            <span>count: {task.count}</span>
-          </div>
-          <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2">
+          {!isEditingInput && (
             <label
               htmlFor="focus"
               className="btn btn-outline btn-error"
@@ -48,15 +54,53 @@ const TaskItem = ({ task }: TaskItemProps) => {
             >
               🍅
             </label>
+          )}
+          {isEditingInput ? (
             <label
-              htmlFor="save button"
-              className="btn btn-outline btn-warning"
+              htmlFor="cancel edit"
+              className="btn btn-ghost"
+              onClick={() => {
+                setIsEditingInput(false);
+                setInput(task.title);
+              }}
             >
-              Save
+              ⏎
             </label>
-          </div>
+          ) : (
+            <label
+              htmlFor="start edit"
+              className="btn btn-outline btn-warning"
+              onClick={() => {
+                setIsEditingInput(true);
+              }}
+            >
+              ✏️
+            </label>
+          )}
+          {isEditingInput ? (
+            <label
+              htmlFor="save edit"
+              className="btn btn-outline btn-success"
+              onClick={async () => {
+                setIsEditingInput(false);
+                if (user?.uid) {
+                  await updateTask(task.id, { ...task, title: input });
+                  await getAll(user?.uid);
+                } else {
+                  await updateTaskWithoutAuth(task.id, {
+                    ...task,
+                    title: input,
+                  });
+                }
+              }}
+            >
+              ✅
+            </label>
+          ) : (
+            <label className="hidden"></label>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
