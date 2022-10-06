@@ -15,13 +15,16 @@ const MainTaskTitle = () => {
   }, [focusedTaskId, tasks]);
 
   return (
-    <div className="p-2">
+    <div className="w-full p-2">
       <h1 className="mb-2 text-2xl font-semibold text-base-light-gray">
         Now focusing on...
       </h1>
-      <h2 className="border-b border-gray-800 pb-2 text-2xl font-bold">
-        {activeTask?.title || "🐶 Add a task first"}
-      </h2>
+      <div className="flex w-full border-b-2 border-base-light-gray">
+        <h2 className="w-full pb-2 text-2xl font-bold line-clamp-1">
+          {activeTask?.title || "🐶 Add a task first"}
+        </h2>
+        <span className="ml-auto">{activeTask?.count}</span>
+      </div>
     </div>
   );
 };

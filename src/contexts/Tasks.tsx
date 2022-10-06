@@ -12,7 +12,7 @@ export type TTask = {
   id: string;
   title: string;
   active: boolean;
-  count: 0;
+  count: number;
 };
 type TTasksContext = {
   state: TTaskState;
@@ -29,6 +29,7 @@ type TTasksContext = {
   updateTaskWithoutAuth: (id: string, task: TTask) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   deleteTaskWithoutAuth: (id: string) => Promise<void>;
+  incrementRound: (id: string, uid?: string) => Promise<void>;
   children?: ReactNode;
 };
 
@@ -39,6 +40,7 @@ enum TaskActionKind {
   UPDATE_TASK = "UPDATE_TASK",
   UPDATE_TASK_WITHOUT_AUTH = "UPDATE_TASK_WITHOUT_AUTH",
   DELETE_TASK = "DELETE_TASK",
+  INCREMENT_ROUND = "INCREMENT_ROUND",
 }
 enum TaskActionKindError {
   GET_ALL_ERR = "GET_ALL_ERR",
@@ -82,6 +84,8 @@ const taskReducer = (state: TTaskState, action: TaskAction): TTaskState => {
         return t.id !== action.payload;
       });
       return { ...state, tasks: updatedTasks };
+    case TaskActionKind.INCREMENT_ROUND:
+      return { ...state, tasks: action.payload };
     default:
       throw new Error();
   }
@@ -175,6 +179,10 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
   }
 
   async function deleteTask(id: string) {
+    if (id === localStorage.getItem("focusedTaskId")) {
+      localStorage.removeItem("focusedTaskId");
+      setFocusedTaskId(null);
+    }
     dispatch({ type: TaskActionKind.DELETE_TASK, payload: id });
     await fetch(`/api/tasks/${id}`, {
       method: "DELETE",
@@ -186,7 +194,36 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
   }
 
   async function deleteTaskWithoutAuth(id: string) {
+    if (id === localStorage.getItem("focusedTaskId")) {
+      localStorage.removeItem("focusedTaskId");
+      setFocusedTaskId(null);
+    }
     dispatch({ type: TaskActionKind.DELETE_TASK, payload: id });
+  }
+
+  async function incrementRound(id: string, uid?: string) {
+    const tasks = state.tasks.map((t) => {
+      if (t.id === id) {
+        t.count += 1;
+      }
+      return t;
+    });
+    dispatch({ type: TaskActionKind.INCREMENT_ROUND, payload: tasks });
+    if (!uid) {
+      return;
+    }
+    try {
+      const task = state.tasks.find((t) => t.id === id);
+      await fetch(`/api/tasks/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: id, task: task }),
+      });
+    } catch (err) {
+      // error
+    }
   }
 
   const values = useMemo(() => {
@@ -201,6 +238,7 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
       updateTaskWithoutAuth,
       deleteTask,
       deleteTaskWithoutAuth,
+      incrementRound,
       isLoading,
       setIsLoading,
     };

@@ -39,10 +39,19 @@ const TaskItem = ({ task }: TaskItemProps) => {
               />
             </>
           ) : (
-            <>
-              {task.id === focusedTaskId && <div>🍅</div>}
-              <span className="">{task.title}</span>
-            </>
+            <div className="flex flex-row gap-2">
+              {task.id === focusedTaskId && (
+                <div className="flex items-center">🍅</div>
+              )}
+              <div className="flex w-full flex-col">
+                <span className="overflow-x-hidden line-clamp-1">
+                  {task.title}
+                </span>
+                <span className="text-xs text-gray-400">
+                  Done {task.count} rounds.
+                </span>
+              </div>
+            </div>
           )}
         </div>
         <div className="flex justify-end gap-2">
@@ -103,25 +112,35 @@ const TaskItem = ({ task }: TaskItemProps) => {
             <label className="hidden"></label>
           )}
         </div>
-        <label htmlFor="delete task" className="modal-button btn btn-ghost">
+        <label
+          htmlFor={`delete task ${task.id}`}
+          className="modal-button btn btn-ghost"
+        >
           <FaRegTrashAlt />
         </label>
-        <input type="checkbox" id="delete task" className="modal-toggle" />
+        <input
+          type="checkbox"
+          id={`delete task ${task.id}`}
+          className="modal-toggle"
+        />
         <div className="modal">
           <div className="modal-box relative text-base-gray">
             <label
-              htmlFor="delete task"
+              htmlFor={`delete task ${task.id}`}
               className="btn btn-circle btn-sm absolute right-2 top-2"
             >
               ✕
             </label>
-            <h3 className="text-xl font-bold">Are you sure?</h3>
+            <h3 className="mb-4 text-xl font-bold">Are you sure?</h3>
+            <p>
+              Delete <span className="font-bold">{task.title}</span>.
+            </p>
             <p className="mb-4 text-base-light-gray">
               You won&apos;t be able to revert this.
             </p>
             <div className="modal-action flex w-full justify-end gap-2">
               <label
-                htmlFor="delete task"
+                htmlFor={`delete task ${task.id}`}
                 className="btn btn-warning"
                 onClick={() => {
                   const sleep = (ms: number) =>
@@ -137,7 +156,10 @@ const TaskItem = ({ task }: TaskItemProps) => {
               >
                 Delete
               </label>
-              <label htmlFor="delete task" className="btn btn-outline">
+              <label
+                htmlFor={`delete task ${task.id}`}
+                className="btn btn-outline"
+              >
                 Cancel
               </label>
             </div>

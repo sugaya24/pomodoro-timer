@@ -11,6 +11,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       },
       data: {
         title: task.title,
+        count: task.count,
       },
     });
     res.status(200).json(updatedTask);
