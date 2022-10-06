@@ -14,6 +14,18 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       },
     });
     res.status(200).json(updatedTask);
+  } else if (req.method === "DELETE") {
+    const { id } = req.body;
+    try {
+      await prisma.task.delete({
+        where: {
+          id: id,
+        },
+      });
+      res.status(204).end();
+    } catch {
+      res.status(400).json({});
+    }
   } else {
     res.status(400).json({});
   }

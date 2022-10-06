@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaRegTrashAlt } from "react-icons/fa";
 
 import { TTask, useAuth, useTasksContext } from "../../../contexts";
 
@@ -13,6 +14,8 @@ const TaskItem = ({ task }: TaskItemProps) => {
     focusedTaskId,
     updateTask,
     updateTaskWithoutAuth,
+    deleteTask,
+    deleteTaskWithoutAuth,
     getAll,
   } = useTasksContext();
   const [isEditingInput, setIsEditingInput] = useState(false);
@@ -99,6 +102,46 @@ const TaskItem = ({ task }: TaskItemProps) => {
           ) : (
             <label className="hidden"></label>
           )}
+        </div>
+        <label htmlFor="delete task" className="modal-button btn btn-ghost">
+          <FaRegTrashAlt />
+        </label>
+        <input type="checkbox" id="delete task" className="modal-toggle" />
+        <div className="modal">
+          <div className="modal-box relative text-base-gray">
+            <label
+              htmlFor="delete task"
+              className="btn btn-circle btn-sm absolute right-2 top-2"
+            >
+              ✕
+            </label>
+            <h3 className="text-xl font-bold">Are you sure?</h3>
+            <p className="mb-4 text-base-light-gray">
+              You won&apos;t be able to revert this.
+            </p>
+            <div className="modal-action flex w-full justify-end gap-2">
+              <label
+                htmlFor="delete task"
+                className="btn btn-warning"
+                onClick={() => {
+                  const sleep = (ms: number) =>
+                    new Promise((resolve) => setTimeout(resolve, ms));
+                  sleep(0).then(() => {
+                    if (user?.uid) {
+                      deleteTask(task.id);
+                    } else {
+                      deleteTaskWithoutAuth(task.id);
+                    }
+                  });
+                }}
+              >
+                Delete
+              </label>
+              <label htmlFor="delete task" className="btn btn-outline">
+                Cancel
+              </label>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -27,6 +27,8 @@ type TTasksContext = {
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   updateTask: (id: string, task: TTask) => Promise<void>;
   updateTaskWithoutAuth: (id: string, task: TTask) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  deleteTaskWithoutAuth: (id: string) => Promise<void>;
   children?: ReactNode;
 };
 
@@ -36,6 +38,7 @@ enum TaskActionKind {
   ADD_TASK = "ADD_TASK",
   UPDATE_TASK = "UPDATE_TASK",
   UPDATE_TASK_WITHOUT_AUTH = "UPDATE_TASK_WITHOUT_AUTH",
+  DELETE_TASK = "DELETE_TASK",
 }
 enum TaskActionKindError {
   GET_ALL_ERR = "GET_ALL_ERR",
@@ -74,6 +77,11 @@ const taskReducer = (state: TTaskState, action: TaskAction): TTaskState => {
       return { ...state };
     case TaskActionKind.UPDATE_TASK_WITHOUT_AUTH:
       return { ...state };
+    case TaskActionKind.DELETE_TASK:
+      const updatedTasks = state.tasks.filter((t) => {
+        return t.id !== action.payload;
+      });
+      return { ...state, tasks: updatedTasks };
     default:
       throw new Error();
   }
@@ -166,6 +174,21 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
     });
   }
 
+  async function deleteTask(id: string) {
+    dispatch({ type: TaskActionKind.DELETE_TASK, payload: id });
+    await fetch(`/api/tasks/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: id }),
+    });
+  }
+
+  async function deleteTaskWithoutAuth(id: string) {
+    dispatch({ type: TaskActionKind.DELETE_TASK, payload: id });
+  }
+
   const values = useMemo(() => {
     return {
       state,
@@ -176,6 +199,8 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
       addTask,
       updateTask,
       updateTaskWithoutAuth,
+      deleteTask,
+      deleteTaskWithoutAuth,
       isLoading,
       setIsLoading,
     };
