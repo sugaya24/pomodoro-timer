@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import useSound from "use-sound";
 
 import { useAuth, useTasksContext } from "../../../contexts";
 import { secToFormattedMin } from "../../../lib/secToFormattedMin";
@@ -11,6 +12,8 @@ const INIT_SHORT_TIME_DURATION = 5;
 const INIT_LONG_TIME_DURATION = 15;
 
 const Timer = () => {
+  const [playDoneBreak] = useSound("/sounds/sound1.wav");
+  const [playDoneFocus] = useSound("/sounds/sound2.wav");
   const { user } = useAuth();
   const { incrementRound, focusedTaskId } = useTasksContext();
   const [key, setKey] = useState(0);
@@ -35,6 +38,7 @@ const Timer = () => {
 
   const handleComplete = () => {
     if (mode === "focus") {
+      playDoneFocus();
       if (doneRounds === rounds - 1) {
         setMode("longBreak");
         setDuration(longBreakDuration);
@@ -53,6 +57,7 @@ const Timer = () => {
         }
       }
     } else {
+      playDoneBreak();
       setMode("focus");
       setDuration(focusDuration);
     }
