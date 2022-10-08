@@ -1,14 +1,20 @@
 import type { AppProps } from "next/app";
 import React from "react";
 
-import { AuthProvider, TasksContextProvider } from "../contexts";
+import {
+  AuthProvider,
+  TasksContextProvider,
+  TimerContextProvider,
+} from "../contexts";
 import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
       <TasksContextProvider>
-        <Component {...pageProps} />
+        <TimerContextProvider>
+          <Component {...pageProps} />
+        </TimerContextProvider>
       </TasksContextProvider>
     </AuthProvider>
   );

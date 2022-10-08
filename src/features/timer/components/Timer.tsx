@@ -2,30 +2,22 @@ import React, { useEffect, useState } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import useSound from "use-sound";
 
-import { useAuth, useTasksContext } from "../../../contexts";
+import { useAuth, useTasksContext, useTimer } from "../../../contexts";
 import { secToFormattedMin } from "../../../lib/secToFormattedMin";
 
 type TMode = "focus" | "shortBreak" | "longBreak";
-
-const INIT_FOCUS_DURATION = 3;
-const INIT_SHORT_TIME_DURATION = 5;
-const INIT_LONG_TIME_DURATION = 15;
 
 const Timer = () => {
   const [playDoneBreak] = useSound("/sounds/sound1.wav");
   const [playDoneFocus] = useSound("/sounds/sound2.wav");
   const { user } = useAuth();
   const { incrementRound, focusedTaskId } = useTasksContext();
+  const {
+    state: { focusDuration, longBreakDuration, shortBreakDuration },
+  } = useTimer();
   const [key, setKey] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
-  const [focusDuration, setFocusDuration] = useState(INIT_FOCUS_DURATION);
-  const [shortBreakDuration, setShortBreakDuration] = useState(
-    INIT_SHORT_TIME_DURATION,
-  );
-  const [longBreakDuration, setLongBreakDuration] = useState(
-    INIT_LONG_TIME_DURATION,
-  );
   const [mode, setMode] = useState<TMode>("focus");
   const [rounds, setRounds] = useState(4);
   const [doneRounds, setDoneRounds] = useState(0);
@@ -35,6 +27,16 @@ const Timer = () => {
     setDuration(focusDuration);
     // TODO: set rounds already done
   }, []);
+
+  useEffect(() => {
+    if (mode === "focus") {
+      setDuration(focusDuration);
+    } else if (mode === "shortBreak") {
+      setDuration(shortBreakDuration);
+    } else if (mode === "longBreak") {
+      setDuration(longBreakDuration);
+    }
+  }, [focusDuration, shortBreakDuration, longBreakDuration]);
 
   const handleComplete = () => {
     if (mode === "focus") {
