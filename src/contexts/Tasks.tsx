@@ -16,6 +16,7 @@ export type TTask = {
 };
 type TTasksContext = {
   state: TTaskState;
+  getTasksEmpty: () => Promise<void>;
   getAll: (uid: string) => Promise<any>;
   createTask: (body: TTask) => Promise<void>;
   focusedTaskId: string | null | undefined;
@@ -34,6 +35,7 @@ type TTasksContext = {
 };
 
 enum TaskActionKind {
+  GET_TASKS_EMPTY = "GET_TASKS_EMPTY",
   GET_ALL = "GET_ALL",
   CREATE_TASK = "CREATE_TASK",
   ADD_TASK = "ADD_TASK",
@@ -65,6 +67,8 @@ type TaskAction =
 
 const taskReducer = (state: TTaskState, action: TaskAction): TTaskState => {
   switch (action.type) {
+    case TaskActionKind.GET_TASKS_EMPTY:
+      return { ...state, tasks: action.payload };
     case TaskActionKind.GET_ALL:
       return { ...state, tasks: action.payload?.tasks || [] };
     case TaskActionKindError.GET_ALL_ERR:
@@ -110,6 +114,10 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
       setFocusedTaskId(localStorage.getItem("focusedTaskId"));
     }
   }, []);
+
+  async function getTasksEmpty() {
+    dispatch({ type: TaskActionKind.GET_TASKS_EMPTY, payload: [] });
+  }
 
   async function getAll(uid: string) {
     try {
@@ -229,6 +237,7 @@ export const TasksContextProvider = ({ children }: { children: ReactNode }) => {
   const values = useMemo(() => {
     return {
       state,
+      getTasksEmpty,
       getAll,
       createTask,
       focusedTaskId,

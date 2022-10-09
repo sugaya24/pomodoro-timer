@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import React, { useCallback, useEffect } from "react";
 
 import Modal from "../components/Modal";
-import { AddIcon, ListIcon } from "../components/icons";
+import { AddIcon } from "../components/icons";
 import { useAuth, useTasksContext } from "../contexts";
 import { Header } from "../features/header/components";
 import { MainTaskTitle } from "../features/main-task-title/components";
@@ -17,12 +17,12 @@ const btnText = (
 
 const Home: NextPage = () => {
   const { user } = useAuth();
-  const { getAll } = useTasksContext();
+  const { getAll, getTasksEmpty } = useTasksContext();
   const stableGetAll = useCallback(getAll, [user]);
 
   useEffect(() => {
     if (!user?.uid) {
-      // TODO: make tasks empty
+      getTasksEmpty();
     } else {
       stableGetAll(user?.uid);
     }
