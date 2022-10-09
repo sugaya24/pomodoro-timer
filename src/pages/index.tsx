@@ -36,14 +36,8 @@ const Home: NextPage = () => {
         <div className="my-16">
           <Timer />
         </div>
-        <div className="flex w-full flex-col justify-center gap-4">
+        <div className="flex w-full justify-center">
           <Modal id="add-task" btnText={btnText} />
-          <div className="flex items-center justify-center">
-            <button className="btn btn-ghost gap-2 hover:bg-transparent">
-              <ListIcon />
-              <span className="font-bold">Task List</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
