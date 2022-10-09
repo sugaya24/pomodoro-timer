@@ -16,7 +16,7 @@ function TaskInput() {
         title: input,
         active: false,
         count: 0,
-        id: input,
+        id: Date.now().toString(),
       };
       await addTask(newTask);
       setInput("");
