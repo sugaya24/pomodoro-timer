@@ -1,4 +1,5 @@
 import type { AppProps } from "next/app";
+import Head from "next/head";
 import React from "react";
 
 import {
@@ -10,13 +11,18 @@ import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <AuthProvider>
-      <TasksContextProvider>
-        <TimerContextProvider>
-          <Component {...pageProps} />
-        </TimerContextProvider>
-      </TasksContextProvider>
-    </AuthProvider>
+    <>
+      <Head>
+        <title>Pomodoro Timer</title>
+      </Head>
+      <AuthProvider>
+        <TasksContextProvider>
+          <TimerContextProvider>
+            <Component {...pageProps} />
+          </TimerContextProvider>
+        </TasksContextProvider>
+      </AuthProvider>
+    </>
   );
 }
 
